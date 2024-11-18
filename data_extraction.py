@@ -2,6 +2,7 @@ import os
 import numpy as np
 
 
+# Find all suitable files in the given directory
 def find_files(directory_path):
     file_paths = []
     for filename in os.listdir(directory_path):
@@ -9,7 +10,7 @@ def find_files(directory_path):
             file_paths.append(os.path.join(directory_path, filename))
     return file_paths
 
-
+# Extracts data per measurement, returns all values for a give measurement
 def extract_information(files):
     variable = 0
     run = 0
@@ -38,14 +39,14 @@ def extract_information(files):
                 variable = 0
     return [x_acc, y_acc, z_acc, x_gyro, y_gyro, z_gyro]
 
-
+# Calculates averages of each list in the argument. The argument is a list of lists.
 def calculate_averages(dataset):
     means = []
     for data in dataset:
         means.append(sum(data) / len(data))
     return means
 
-
+# Splits the provided data into two lists
 def split_pos_neg(dataset):
     split_dataset = []
     for data in dataset:
@@ -54,7 +55,7 @@ def split_pos_neg(dataset):
         split_dataset.extend([positive, negative])
     return split_dataset
 
-
+# Calculates scaling value based on values and provided g or angular velocity scalar.
 def calculate_scaling(values, scaler):
     scaling = []
     split_dataset = split_pos_neg(values)
