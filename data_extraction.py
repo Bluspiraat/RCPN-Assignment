@@ -41,6 +41,14 @@ def calculate_averages(dataset):
         means.append(sum(data) / len(data))
     return means
 
+def split_pos_neg(dataset):
+    split_dataset = []
+    for data in dataset:
+        positive = [number for number in data if number >= 0]
+        negative = [number for number in data if number < 0]
+        split_dataset.append([positive, negative])
+    return split_dataset
+
 
 if __name__ == "__main__":
     path = ("2024 RPCN imu calibration/")
@@ -48,5 +56,6 @@ if __name__ == "__main__":
     files = find_files(path)
     data = extract_information(files)
     averages = calculate_averages(data)
+    split_dataset = split_pos_neg(data)
     print("Done")
 
