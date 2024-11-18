@@ -1,4 +1,6 @@
 import os
+import numpy as np
+
 
 def find_files(directory_path):
     file_paths = []
@@ -6,6 +8,7 @@ def find_files(directory_path):
         if filename.endswith('.txt'):
             file_paths.append(os.path.join(directory_path, filename))
     return file_paths
+
 
 def extract_information(files):
     variable = 0
@@ -35,27 +38,39 @@ def extract_information(files):
                 variable = 0
     return [x_acc, y_acc, z_acc, x_gyro, y_gyro, z_gyro]
 
+
 def calculate_averages(dataset):
     means = []
     for data in dataset:
         means.append(sum(data) / len(data))
     return means
 
+
 def split_pos_neg(dataset):
     split_dataset = []
     for data in dataset:
         positive = [number for number in data if number >= 0]
         negative = [number for number in data if number < 0]
-        split_dataset.append([positive, negative])
+        split_dataset.extend([positive, negative])
     return split_dataset
+
+
+def calculate_scaling(values, scaler):
+    scaling = []
+    split_dataset = split_pos_neg(values)
+    averages = calculate_averages(split_dataset)
+    for i in range(int(len(averages) / 2)):
+        scaling.append((averages[2 * i] - averages[2 * i + 1] - scaler) / scaler)
+    return scaling
 
 
 if __name__ == "__main__":
     path = ("2024 RPCN imu calibration/")
+    g_scaling = 9.80665 * 2
+    omega_scaling = 2 * 0.0042 * np.sin(0.9114)  # Adjust for latitude
     # measurement_order = ['z', 'y', 'x']
     files = find_files(path)
     data = extract_information(files)
-    averages = calculate_averages(data)
-    split_dataset = split_pos_neg(data)
-    print("Done")
-
+    print(f'bias: {calculate_averages(data)}')
+    print(f'scaling acceleration: {calculate_scaling(data[0:3], g_scaling)}')
+    print(f'scaling gyro: {calculate_scaling(data[3::], omega_scaling)}')
